@@ -1,6 +1,4 @@
-/* does nothing yet, intentions are to simplify
- * configuration of the makefile
- */
+/* change your makefile flags here */
 
 static char *compilers = "CC";
 static char *flags = "CFLAGS";
