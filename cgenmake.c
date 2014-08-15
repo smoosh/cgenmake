@@ -18,7 +18,7 @@
 #include <sys/stat.h> /* for stat */
 #include <errno.h> /* for errno */
 
-#include "cgenmake.h"
+#include "errchk.h"
 #include "config.h"
 
 /* prototypes */
