@@ -19,9 +19,11 @@
 #include <errno.h> /* for errno */
 
 #include "cgenmake.h"
+#include "config.h"
 
 /* prototypes */
 char *usage();
+char *gen_make(char *,FILE *);
 
 int main(int argc, char *argv[])
 {
@@ -107,4 +109,26 @@ char *usage(void)
     };
 
   return msg;
+}
+
+/* print basic template to makefile */
+char *gen_make(char *src, FILE *fp)
+{
+  /* these variables do nothing yet */
+	int c, hflag, nflag;
+
+  /* 
+   * char *cc = "CC";
+     char *cflags = "CFLAGS";
+	   char *flags = "-g -o"; change your flags here
+  */
+
+  fprintf(fp, "%s = gcc\n", compilers);
+ 	fprintf(fp, "%s = %s\n\n", flags, args);
+  fprintf(fp, "%s: %s.c\n", src, src);
+  fprintf(fp, "\t$(%s) $(%s) %s %s.c\n", compilers, flags, src, src);
+	fprintf(fp, "\t@echo \'Done.\'\n\n");
+ 	fprintf(fp, "clean:\n\trm -rf *.o %s\n", src);
+
+  return src;
 }

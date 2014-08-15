@@ -5,25 +5,6 @@
 
 #define BUFSIZE 80
 
-/* print basic template to makefile */
-char *gen_make(char *src, FILE *fp)
-{
-	int c, hflag, nflag;
-
-  char *cc = "CC";
-  char *cflags = "CFLAGS";
-	char *flags = "-g -o"; /* change your flags here */
-
-  fprintf(fp, "%s = gcc\n", cc);
- 	fprintf(fp, "%s = %s\n\n", cflags, flags);
-  fprintf(fp, "%s: %s.c\n", src, src);
-  fprintf(fp, "\t$(%s) $(%s) %s %s.c\n", cc, cflags, src, src);
-	fprintf(fp, "\t@echo \'Done.\'\n\n");
- 	fprintf(fp, "clean:\n\trm -rf *.o %s\n", src);
-
-  return src;
-}
-
 /* check if makefile's name is valid */
 /* potential exploit if bufsize > 80, might cause overflow */
 int chk_make(char *mkf)
