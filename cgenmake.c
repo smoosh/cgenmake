@@ -5,9 +5,7 @@
 	* generator. This will become more complex in 
 	* future iterations.
   * 
-  * -cemetery
-  *
-  *  Version: 1.3.0
+  * - cemetery
   *
   * * * * * * * * * * * * * * * * * * * * * * * */
 
