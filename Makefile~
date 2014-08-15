@@ -1,0 +1,9 @@
+CC = gcc
+CFLAGS = -g -o
+
+genmake: genmake.c genmake.h
+	$(CC) $(CFLAGS) genmake genmake.c
+	@echo "Done."
+
+clean:
+	rm -rf *.o genmake
