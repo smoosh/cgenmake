@@ -6,7 +6,7 @@
 #define BUFSIZE 80
 
 /* check if makefile's name is valid */
-/* potential exploit if bufsize > 80, might cause overflow */
+
 int chk_make(char *mkf)
 {
 	int auth_flag = 0;
@@ -36,7 +36,7 @@ Bool fexists(char *file)
   return found;
 }
 
-/* die, error handling */
+/* error handling */
 void die(const char *errstr, ...)
 {
   va_list ap;
