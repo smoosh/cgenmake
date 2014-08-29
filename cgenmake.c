@@ -88,7 +88,7 @@ void genmake(int argc, char **argv)
   if (a.hfile == NULL) {
     fprintf(outstream, "%s = gcc\n", compiler);
     fprintf(outstream, "%s = %s\n\n", flags, gcc_args);
-    fprintf(outstream, "%s: %s\n", a.cfile, a.cfile);
+    fprintf(outstream, "%s: %s\n", binfile, a.cfile);
     fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
         compiler, flags, binfile, a.cfile);
     fprintf(outstream, "\t@echo \'Done.\'\n\n");
@@ -97,7 +97,7 @@ void genmake(int argc, char **argv)
   else {
     fprintf(outstream, "%s = gcc\n", compiler);
     fprintf(outstream, "%s = %s\n\n", flags, gcc_args);
-    fprintf(outstream, "%s: %s %s\n", a.cfile, a.cfile,
+    fprintf(outstream, "%s: %s %s\n", binfile, a.cfile,
         a.hfile); /* header file is added here */
     fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
         compiler, flags, binfile, a.cfile);

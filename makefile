@@ -6,4 +6,4 @@ cgenmake: cgenmake.c
 	@echo 'Done.'
 
 clean:
-	rm -rf *.o cgenmake
+	rm -rf *.o cgenmake.c
