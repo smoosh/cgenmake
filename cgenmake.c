@@ -1,134 +1,122 @@
- /* * * * * * * * * * * * * * * * * * * * * * * *
-  *
-  * For a little bit of convenience I've decided 
-	* to make a very simplistic form of a makefile 
-	* generator. This will become more complex in 
-	* future iterations.
-  * 
-  * - cemetery
-  *
-  * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * *
+ * Use this as a template 
+ * - cemetery
+ * * * */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h> 
-#include <ctype.h>
-#include <unistd.h> /* for getopt */
-#include <getopt.h> /* for getopt_long */
-#include <sys/stat.h> /* for stat */
-#include <errno.h> /* for errno */
+#include <argp.h>
 
-#include "errchk.h"
-#include "config.h"
+#include "config.h" /* parse real config file in future */
+#include "err.h"
 
-/* prototypes */
-char *usage();
-char *gen_make(char *,FILE *);
+#define BUFSIZE 80
 
-int main(int argc, char *argv[])
+/* structure which holds arguments variables and makefile data */
+struct arguments {
+  char *args[1];
+  int force;
+  char *cfile; /* source file var */
+  char *hfile; /* header file var */
+  char *mfile; /* makefile var */
+  char binfile[BUFSIZE];
+};
+
+static struct argp_option options[] =
 {
-  int c, i;
-	
-	/* option flags */
-	int nflag, wflag, hflag;
-	nflag = wflag = hflag = 0;
+  { "cfile", 'c', "example.c", 0,
+    "Insert a source file into the makefile" },
+  { "hfile", 'h', "example.h", 0,
+    "Insert a header file into the makefile" },
+  { "force", 'f', 0, 0,
+    "Overwrite an existing makefile"},
+ {0}
+};
 
-  char *cc = "CC";
-  char *cflags = "CFLAGS";
-  FILE *fp;
+static error_t parse_opt(int key, char *arg,
+                         struct argp_state *state)
+{
+  struct arguments *arguments = state->input;
 
-  struct stat sts;
-
-  while ((c = getopt(argc, argv, "f:s:n:w:h")) != -1)
-    switch (c) {
-    case 'n':
-			nflag = 1;
-      break;
-    case 'w':
-			wflag = 1;
+  switch (key) {
+    case 'c':
+      arguments->cfile = arg;
       break;
     case 'h':
-			hflag = 1;
+      arguments->hfile = arg;
       break;
-    case '?':
-			if (optopt == 'n' || optopt == 'w')
-				fprintf(stderr, "Option -%c requires and argument.\n", optopt);
-      else if (isprint(optopt))
-				fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-      else
-				fprintf(stderr, "Unknown option char `\\x%x'.\n", optopt);
-      return 1;
+    case 'f':
+      arguments->force = 1;
+      break;
+    case ARGP_KEY_ARG:
+      if (state->arg_num >= 1)
+        argp_usage(state);
+      arguments->args[state->arg_num] = arg;
+      break;
+    case ARGP_KEY_END:
+      if (state->arg_num < 1)
+        argp_usage(state);
+      break;
     default:
-      abort();
-      break;
-    }
-
-  /* create a new makefile if !exists */
-	if (nflag) {
-    //if ((stat(argv[2], &sts)) == -1 || errno == ENONET) {
-    if (!fexists(argv[2])) {
-				/* error handling */
-				if (argc > 4)
-					fprintf(stderr, "Too many arguments.\n");
-				else if (chk_make(argv[2])) {
-          fp = fopen(argv[2], "w");
-				  gen_make(argv[3], fp);
-          fclose(fp);
-        } else
-          die("This is not a valid makefile: "
-            "[Makefile || makefile]\n");
-      } else {
-					fprintf(stderr, "%s already exists.\n", argv[2]);
-					return 1;
-      }
-  /* overwrite existing makefiles */
-	} else if (wflag) {
-      if (chk_make(argv[2])) {
-        fp = fopen(argv[2], "w");
-      	gen_make(argv[3], fp);
-        fclose(fp);
-      } else
-        die("This is not a valid makefile: "
-            "[Makefile || makefile]\n");
-
-  /* TODO: insert a header */
-	} else if (hflag)
-		printf("%s", usage());
-
+      return ARGP_ERR_UNKNOWN;
+  }
   return 0;
 }
 
-char *usage(void)
-{
-  static char *msg =
-    {
-      "Usage: -[n:w:h]\n"
-      "\t-n [filename] [source file(s)]: Create new makefile.\n"
-      "\t-w [filename] [source file(s)]: Overwrite existing makefile.\n"
-      "\t-h: Display help.\n"
-    };
+static char args_doc[] = "makefile || Makefile";
 
-  return msg;
+/* declare argp struct */
+static struct argp argp = {options, parse_opt, args_doc};
+
+/* generate the makefile */
+void genmake(int argc, char **argv)
+{
+  struct arguments a/*rguments*/;
+  FILE *outstream;
+  char binfile[BUFSIZE];
+
+  a.force = 0;
+  a.cfile = "";
+  a.hfile = NULL;
+
+  argp_parse(&argp, argc, argv, 0, 0, &a);
+
+  outstream = fopen(a.args[0], "w");
+
+  /* cut off the last to chars in cfile and copy to binfile array */
+  strncpy(binfile, a.cfile, strlen(a.cfile)-2);
+  
+  if (a.hfile == NULL) {
+    fprintf(outstream, "%s = gcc\n", compiler);
+    fprintf(outstream, "%s = %s\n\n", flags, gcc_args);
+    fprintf(outstream, "%s: %s\n", a.cfile, a.cfile);
+    fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
+        compiler, flags, binfile, a.cfile);
+    fprintf(outstream, "\t@echo \'Done.\'\n\n");
+    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", a.cfile);
+  }
+  else {
+    fprintf(outstream, "%s = gcc\n", compiler);
+    fprintf(outstream, "%s = %s\n\n", flags, gcc_args);
+    fprintf(outstream, "%s: %s %s\n", a.cfile, a.cfile,
+        a.hfile); /* header file is added here */
+    fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
+        compiler, flags, binfile, a.cfile);
+    fprintf(outstream, "\t@echo \'Done.\'\n\n");
+    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", a.cfile);
+  }
+  fclose(outstream);
 }
 
-/* print basic template to makefile */
-char *gen_make(char *src, FILE *fp)
+/* main */
+int main(int argc, char **argv)
 {
-  /* these variables do nothing yet */
-	int c, hflag, nflag;
+  struct arguments a;
+  argp_parse(&argp, argc, argv, 0, 0, &a);
 
-  /* 
-   * char *cc = "CC";
-     char *cflags = "CFLAGS";
-	   char *flags = "-g -o"; change your flags here
-  */
-
-  fprintf(fp, "%s = gcc\n", compilers);
- 	fprintf(fp, "%s = %s\n\n", flags, args);
-  fprintf(fp, "%s: %s.c\n", src, src);
-  fprintf(fp, "\t$(%s) $(%s) %s %s.c\n", compilers, flags, src, src);
-	fprintf(fp, "\t@echo \'Done.\'\n\n");
- 	fprintf(fp, "clean:\n\trm -rf *.o %s\n", src);
-
-  return src;
+  if (!fexists(a.args[0]) || a.force == 1)
+    genmake(argc, argv);
+  else
+    fprintf(stderr, "%s already exists. "
+                    "Use -f to overwrite.\n", a.args[0]);
+  return 0;
 }

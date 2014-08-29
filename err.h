@@ -1,12 +1,14 @@
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #define BUFSIZE 80
 
 /* check if makefile's name is valid */
-/* potential exploit if bufsize > 80, might cause overflow */
+
 int chk_make(char *mkf)
 {
 	int auth_flag = 0;
@@ -36,7 +38,7 @@ Bool fexists(char *file)
   return found;
 }
 
-/* die, error handling */
+/* error handling */
 void die(const char *errstr, ...)
 {
   va_list ap;

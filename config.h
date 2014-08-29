@@ -1,6 +1,5 @@
-/* change your makefile flags here */
+const char *compiler = "CC";
+/* const char *cflags = "CFLAGS"; */
+const char *flags = "CFLAGS";
+const char *gcc_args = "-g -o";
 
-static char *linkers = NULL;
-static char *compilers = "CC";
-static char *flags = "CFLAGS";
-static char *args = "-g -o";
