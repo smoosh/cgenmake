@@ -44,23 +44,8 @@ static error_t parse_opt(int key, char *arg,
     case 'h':
       arguments->hfile = arg;
       break;
-<<<<<<< HEAD
     case 'f':
       arguments->force = 1;
-=======
-    case '?':
-			if (optopt == 'n' || optopt == 'w')
-				fprintf(stderr, "Option -%c requires and argument.\n",
-            optopt);
-      else if (isprint(optopt))
-				fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-      else
-				fprintf(stderr, "Unknown option char `\\x%x'.\n",
-            optopt);
-      return 1;
-    default:
-      abort();
->>>>>>> ab27488884106c2692c3e5fff89e14714ca99b45
       break;
     case ARGP_KEY_ARG:
       if (state->arg_num >= 1)
