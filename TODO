@@ -1,9 +1,3 @@
  o Cut down on printfs
  o Generate more complex makefiles
  o Add support for generating configure scripts
- o Write y/n prompt before overwriting on -w option.
-
- o Calling the elements of argv explicitly causes unwanted errors if input is not
-   exact
- o Possibly remove the option to name the makefile entirely.
-
