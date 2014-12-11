@@ -82,7 +82,7 @@ void genmake(int argc, char **argv)
 
   outstream = fopen(a.args[0], "w");
 
-  /* cut off the last to chars in cfile and copy to binfile array */
+  /* cut off the last two chars in cfile and copy to binfile array */
   strncpy(binfile, a.cfile, strlen(a.cfile)-2);
   
   if (a.hfile == NULL) {
@@ -102,7 +102,7 @@ void genmake(int argc, char **argv)
     fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
         compiler, flags, binfile, a.cfile);
     fprintf(outstream, "\t@echo \'Done.\'\n\n");
-    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", a.cfile);
+    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", binfile);
   }
   fclose(outstream);
 }
