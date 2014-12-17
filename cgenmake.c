@@ -92,7 +92,7 @@ void genmake(int argc, char **argv)
     fprintf(outstream, "\t$(%s) $(%s) %s %s\n", 
         compiler, flags, binfile, a.cfile);
     fprintf(outstream, "\t@echo \'Done.\'\n\n");
-    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", a.cfile);
+    fprintf(outstream, "clean:\n\trm -rf *.o %s\n", binfile);
   }
   else {
     fprintf(outstream, "%s = gcc\n", compiler);
